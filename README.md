@@ -5,12 +5,12 @@
 ---
 
 - ссылка на докер image
-
   https://drive.google.com/file/d/1nQV2-l1u5sgz6fN9leuHeqbititRGyf6/view?usp=sharing
+  
 - для запуска контейнера нужно выолнить
 - docker run -it --rm --name=container_name -p=8000:8000 team_8 
 - для открытия сайта перейти по url
-- localhost:8000
+- [localhost:8000](http://localhost:8000)
 
 - для сборки модели через проект нужно выполнить команду 
 - python src/pipeline_pack_model.py train 
