@@ -1,0 +1,36 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.so
+*.egg-info/
+
+# --- Virtual env ---
+venv/
+env/
+.venv/
+
+# --- Jupyter / data ---
+.ipynb_checkpoints/
+*.sqlite
+*.db
+*.tar
+*.zip
+*.csv
+
+# --- IDE / OS ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# --- Secrets ---
+*.env
+.env.*
+
+# --- Docker build cache ---
+**/__pycache__/
+*.log
+
+src/models
+data/

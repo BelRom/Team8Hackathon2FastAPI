@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predictor – Demo</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;max-width:680px;margin:40px auto;padding:0 20px}
+    h1{font-size:24px;margin-bottom:24px}
+    fieldset{border:1px solid #ccc;border-radius:6px;margin-bottom:24px;padding:16px}
+    legend{padding:0 6px;font-weight:bold}
+
+    /* поля формы */
+    .field{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .field label{min-width:180px;font-size:14px}
+    .field input,.field select{flex:1 1 0;padding:8px;border:1px solid #ccc;border-radius:4px}
+
+    /* кнопка */
+    button{padding:10px 26px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;position:relative;font-size:16px}
+    button:disabled{background:#9e9e9e;cursor:not-allowed}
+    .loader{display:inline-block;width:18px;height:18px;border:3px solid #f3f3f3;border-radius:50%;border-top:3px solid #fff;animation:spin 1s linear infinite;margin-left:10px}
+    @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+
+    #response{margin-top:24px;white-space:pre-wrap;word-break:break-all}
+  </style>
+</head>
+<body>
+  <h1>Prediction API Form</h1>
+  <form id="predictForm" onsubmit="event.preventDefault(); sendData();">
+    <fieldset>
+      <legend>Session</legend>
+      <div class="field"><label for="session_id">session_id</label><input type="text" id="session_id" required></div>
+      <div class="field"><label for="client_id">client_id</label><input type="text" id="client_id" required></div>
+      <div class="field"><label for="visit_date">visit_date</label><input type="date" id="visit_date" required></div>
+      <div class="field"><label for="visit_time">visit_time</label><input type="time" id="visit_time" step="1" required></div>
+      <div class="field"><label for="visit_number">visit_number</label><input type="number" id="visit_number" min="1" value="1" required></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>UTM</legend>
+      <div class="field"><label for="utm_source">utm_source</label><input type="text" id="utm_source"></div>
+      <div class="field"><label for="utm_medium">utm_medium</label><input type="text" id="utm_medium"></div>
+      <div class="field"><label for="utm_campaign">utm_campaign</label><input type="text" id="utm_campaign"></div>
+      <div class="field"><label for="utm_adcontent">utm_adcontent</label><input type="text" id="utm_adcontent"></div>
+      <div class="field"><label for="utm_keyword">utm_keyword</label><input type="text" id="utm_keyword"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Device</legend>
+      <div class="field"><label for="device_category">device_category</label><select id="device_category"><option value="">—</option><option>desktop</option><option>mobile</option><option>tablet</option></select></div>
+      <div class="field"><label for="device_os">device_os</label><input type="text" id="device_os"></div>
+      <div class="field"><label for="device_brand">device_brand</label><input type="text" id="device_brand"></div>
+      <div class="field"><label for="device_model">device_model</label><input type="text" id="device_model"></div>
+      <div class="field"><label for="device_screen_resolution">device_screen_resolution</label><input type="text" id="device_screen_resolution" placeholder="1920x1080"></div>
+      <div class="field"><label for="device_browser">device_browser</label><input type="text" id="device_browser"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Geo</legend>
+      <div class="field"><label for="geo_country">geo_country</label><input type="text" id="geo_country"></div>
+      <div class="field"><label for="geo_city">geo_city</label><input type="text" id="geo_city"></div>
+    </fieldset>
+
+    <button id="submitBtn">Predict</button>
+  </form>
+  <div id="response"></div>
+
+  <script>
+    async function sendData(){
+      const btn = document.getElementById('submitBtn');
+      const originalText = btn.innerHTML;
+      btn.disabled = true; btn.innerHTML = 'Predicting <span class="loader"></span>';
+
+      const ids = [
+        'session_id','client_id','visit_date','visit_time','visit_number','utm_source','utm_medium','utm_campaign','utm_adcontent','utm_keyword','device_category','device_os','device_brand','device_model','device_screen_resolution','device_browser','geo_country','geo_city'
+      ];
+      const payload = {};
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        payload[id] = el.value === '' ? null : (id==='visit_number'? parseInt(el.value,10): el.value);
+      });
+
+      try{
+        const res = await fetch('http://localhost:8000/predict',{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const json = await res.json();
+        document.getElementById('response').innerText = JSON.stringify(json,null,2);
+      }catch(err){
+        document.getElementById('response').innerText = 'Ошибка: '+err.message;
+      }finally{
+        btn.disabled = false; btn.innerHTML = originalText;
+      }
+    }
+  </script>
+</body>
+</html>
